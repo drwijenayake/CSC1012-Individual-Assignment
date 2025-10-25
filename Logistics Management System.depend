@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1761383263 source:c:\users\asus\desktop\csc 1012 individual assignment\logistics management system\main.c
+	<stdio.h>
+	<stdlib.h>
+
