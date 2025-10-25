@@ -10,21 +10,37 @@ int cityCount = 0;
 int deliveryCount = 0;
 
 //global arrays
-char cityNames[MAX_CITIES][50];              // Store city names
+char cityNames[MAX_CITIES][50];
 int distanceMatrix[MAX_CITIES][MAX_CITIES];
+int srcList[MAX_DELIVERIES];
+int destList[MAX_DELIVERIES];
+float weightList[MAX_DELIVERIES];
+int vehicleTypeList[MAX_DELIVERIES];         // Vehicle type 1–3
+float distanceList[MAX_DELIVERIES];
+float costList[MAX_DELIVERIES];
+float fuelUsedList[MAX_DELIVERIES];
+float fuelCostList[MAX_DELIVERIES];
+float totalCostList[MAX_DELIVERIES];
+float profitList[MAX_DELIVERIES];
+float chargeList[MAX_DELIVERIES];
+float timeList[MAX_DELIVERIES];
+
 
 //function declarations
 void manageCities();
 void manageDistances();
+
+//file handling
 void loadRoutes();
 void saveRoutes();
-
+void loadDeliveries();
+void saveDeliveries();
 
 int main()
 {
+
     loadRoutes();
     saveRoutes();
-
     int choice;
     do{
         printf("Enter choice: \n");
@@ -36,10 +52,19 @@ int main()
         printf("6. Delivery records.\n");
         printf("7. Performance reports. \n");
         scanf("%d",&choice);
+
         switch (choice){
             case 1:
-                manageCities();
-                break;
+
+                    manageCities();
+                    break;
+
+            case 2:
+                    manageDistances();
+                    break;
+            case 3:
+                    break;
+
 
         }
 
@@ -86,10 +111,13 @@ void manageCities(){
                     int index1;
                     printf("Enter the city number to be removed (1-%d): \n",cityCount);
                     scanf("%d",&index1);
-                    int l,m,k;
+                    int l,m,k,p;
 
-                    for(l=index1-1; l<cityCount-1; l++){         //assigning the above name to the below index in the cityNames array
-                        cityNames[l][50]=cityNames[l+1][50];
+                    for(l=index1-1; l<cityCount-1; l++){
+                        p=0;                                        //assigning the above name to the below index in the cityNames array
+                        while ((cityNames[l][p] = cityNames[l + 1][p]) != '\0') {
+                            p++;
+                        }
                     }
                     for(l=index1-1; l<cityCount-1; l++){               //assigning the above row distance to the below row distance in the distanceMatrix
                         for(m=0; m<cityCount-1; m++){
@@ -102,8 +130,9 @@ void manageCities(){
                            distanceMatrix[k][m]=distanceMatrix[k][m+1];
                         }
                     }
-
+                    cityCount--;
                     printf("City removed successfully!\n");
+
                     break;
 
             case 4:
@@ -123,9 +152,73 @@ void manageCities(){
 
 }
 
+void manageDistances()
+{
+    int choice;
+    do{
+        printf("Enter choice: \n");
 
-//manageDistances(){
+        printf("1. Add distance. \n");
+        printf("2. Edit distance. \n");
+        printf("3. Display distance table. \n");
+        printf("4. Exit to main menu. \n");
+        scanf("%d",&choice);
+        switch (choice){
+            case 1:
+                    int s,d,distance;
+                    printf("Enter the source city index (1-%d) \n",cityCount);
+                    scanf("%d",&s);
+                    printf("Enter the destination city index (1-%d)", cityCount);
+                    scanf("%d",&d);
+                    if(s==d){
+                        distanceMatrix[s][d]=distanceMatrix[d][s]=0;
+                    }
+                    else{
+                        printf("Enter the distance between %s and %s in km (eg: 150)",cityNames[s],cityNames[d]);
+                        scanf("%d",&distance);
+                        distanceMatrix[s][d]=distance;
+                        distanceMatrix[d][s]=distance;
+                    }
+                    break;
 
+            case 2:
+                    int s1,d1,distance1;
+                    printf("Enter the source city index (1-%d) \n",cityCount);
+                    scanf("%d",&s1);
+                    printf("Enter the destination city index (1-%d)", cityCount);
+                    scanf("%d",&d1);
+                    if(s==d){
+                        distanceMatrix[s1][d1]=distanceMatrix[d1][s1]=0;
+                    }
+                    else{
+                        printf("Enter the new distance between %s and %s in km (eg: 200)",cityNames[s1],cityNames[d1]);
+                        scanf("%d",&distance1);
+                        distanceMatrix[s1][d1]=distance1;
+                        distanceMatrix[d1][s1]=distance1;
+                    }
+                    break;
+
+            case 3:
+                    int  k, l, m;
+                    printf("\t       ");
+                    for(k=0; k<cityCount; k++){
+                        printf("%-15s",cityNames[k]);
+                    }
+                    printf("\n");
+                    for(l=0; l<cityCount; l++){
+                        printf("%-15s",cityNames[l]);
+                        for(m=0; m<cityCount; m++){
+                            printf("%-15d", distanceMatrix[l][m]);
+                        }
+                        printf("\n");
+                    }
+                    break;
+
+            case 4:
+                    break;
+        }
+    } while(choice!=4);
+}
 
 
 void loadRoutes() {
@@ -167,5 +260,39 @@ void saveRoutes() {
         fprintf(fp, "\n");
     }
     printf("Routes saved\n");
+    fclose(fp);
+}
+
+void loadDeliveries() {
+    FILE *fp = fopen("deliveries.txt", "r");
+    if (fp == NULL) {
+        deliveryCount = 0;
+        return;
+    }
+    fscanf(fp, "%d", &deliveryCount);
+    for (int i = 0; i < deliveryCount; i++) {
+        fscanf(fp, "%d %d %f %d %f %f %f %f %f %f %f %f",
+               &srcList[i], &destList[i], &weightList[i], &vehicleTypeList[i],
+               &distanceList[i], &costList[i], &fuelUsedList[i],
+               &fuelCostList[i], &totalCostList[i], &profitList[i],
+               &chargeList[i], &timeList[i]);
+    }
+    fclose(fp);
+}
+
+void saveDeliveries() {
+    FILE *fp = fopen("deliveries.txt", "w");
+    if (fp == NULL) {
+        printf("Error saving deliveries!\n");
+        return;
+    }
+    fprintf(fp, "%d\n", deliveryCount);
+    for (int i = 0; i < deliveryCount; i++) {
+        fprintf(fp, "%d %d %.2f %d %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n",
+                srcList[i], destList[i], weightList[i], vehicleTypeList[i],
+                distanceList[i], costList[i], fuelUsedList[i],
+                fuelCostList[i], totalCostList[i], profitList[i],
+                chargeList[i], timeList[i]);
+    }
     fclose(fp);
 }
