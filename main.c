@@ -45,6 +45,7 @@ void manageDistances();
 void addVehicleData();
 void addDelivery();
 void deliveryCalculations();
+void viewDeliveries();
 
 //file handling
 void loadRoutes();
@@ -91,6 +92,9 @@ int main()
                     deliveryCalculations();
                     break;
 
+            case 6:
+                    void viewDeliveries();
+                    break;
 
         }
 
@@ -354,6 +358,17 @@ void deliveryCalculations(){
     deliveryCount++;
 }
 
+void viewDeliveries() {
+    if (deliveryCount == 0) {
+        printf("No deliveries recorded.\n");
+        return;
+    }
+    for (int i = 0; i < deliveryCount; i++) {
+        printf("\nDelivery #%d\nFrom: %s\nTo: %s\nVehicle: %s\nWeight: %.2f kg\nCharge: %.2f LKR\n",
+               i + 1, cityNames[srcList[i]], cityNames[destList[i]], vehiclenames[vehicleTypeList[i] - 1],
+               weightList[i], chargeList[i]);
+    }
+}
 
 //file handling functions
 void loadRoutes() {
