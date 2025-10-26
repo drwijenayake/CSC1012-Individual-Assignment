@@ -46,6 +46,8 @@ void addVehicleData();
 void addDelivery();
 void deliveryCalculations();
 void viewDeliveries();
+void showReports();
+
 
 //file handling
 void loadRoutes();
@@ -53,11 +55,12 @@ void saveRoutes();
 void loadDeliveries();
 void saveDeliveries();
 
+
 int main()
 {
 
     loadRoutes();
-    saveRoutes();
+    loadDeliveries();
     int choice;
     do{
         printf("Enter choice: \n");
@@ -96,9 +99,14 @@ int main()
                     void viewDeliveries();
                     break;
 
+            case 7:
+                    void showReports();
+                    break;
         }
 
     } while(choice!=8);
+    saveRoutes();
+    saveDeliveries();
 
     return 0;
 }
@@ -369,6 +377,22 @@ void viewDeliveries() {
                weightList[i], chargeList[i]);
     }
 }
+
+void showReports() {
+    if (deliveryCount == 0) {
+        printf("No deliveries yet.\n");
+        return;
+    }
+    float totalDist = 0, totalProfit = 0, totalRev = 0;
+    for (int i = 0; i < deliveryCount; i++) {
+        totalDist += distanceList[i];
+        totalProfit += profitList[i];
+        totalRev += chargeList[i];
+    }
+    printf("\n--- PERFORMANCE REPORT ---\n");
+    printf("Total Deliveries: %d\nTotal Distance: %.2f km\nTotal Revenue: %.2f LKR\nTotal Profit: %.2f LKR\n", deliveryCount, totalDist, totalRev, totalProfit);
+}
+
 
 //file handling functions
 void loadRoutes() {
