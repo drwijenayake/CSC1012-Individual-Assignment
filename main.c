@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_CITIES 30
 #define MAX_DELIVERIES 50
@@ -29,7 +30,7 @@ float timeList[MAX_DELIVERIES];
 
 
 //vehicle arrays
-int vehicleTypeList[MAX_VEHICLES];
+int vehicleTypeList[MAX_DELIVERIES];
 char vehiclenames[MAX_VEHICLES][20];
 int capacity[MAX_VEHICLES];
 int ratePerKm[MAX_VEHICLES];
@@ -39,8 +40,11 @@ int fuelEfficiency[MAX_VEHICLES];
 
 //function declarations
 void manageCities();
+void printCityIndices();
 void manageDistances();
 void addVehicleData();
+void addDelivery();
+void deliveryCalculations();
 
 //file handling
 void loadRoutes();
@@ -76,7 +80,11 @@ int main()
                     break;
 
             case 3:
-                    addVehicleData()
+                    addVehicleData();
+                    break;
+
+            case 4:
+                    addDelivery();
                     break;
 
 
@@ -150,10 +158,7 @@ void manageCities(){
                     break;
 
             case 4:
-                    int n;
-                    for(n=0; n<cityCount; n++){
-                        printf("%d. %s\n",n+1, cityNames[n]);
-                    }
+                    printCityIndices();
                     break;
 
             case 5:
@@ -164,6 +169,13 @@ void manageCities(){
       } while (choice!=5);
 
 
+}
+
+void printCityIndices(){
+    int n;
+    for(n=0; n<cityCount; n++){
+        printf("%d. %s\n",n+1, cityNames[n]);
+    }
 }
 
 void manageDistances()
@@ -234,7 +246,112 @@ void manageDistances()
     } while(choice!=4);
 }
 
+//delivery functions
 
+
+void addVehicleData(){
+    vehicleTypeList[0] = 1;
+    strcpy(vehiclenames[0], "Van");
+    capacity[0] = 1000;
+    ratePerKm[0] = 30;
+    avgSpeed[0] = 60;
+    fuelEfficiency[0] = 12;
+
+
+    vehicleTypeList[1] = 2;
+    strcpy(vehiclenames[1], "Truck");
+    capacity[1] = 5000;
+    ratePerKm[1] = 40;
+    avgSpeed[1] = 50;
+    fuelEfficiency[1] = 6;
+
+
+    vehicleTypeList[2] = 3;
+    strcpy(vehiclenames[2], "Lorry");
+    capacity[2] = 10000;
+    ratePerKm[2] = 80;
+    avgSpeed[2] = 45;
+    fuelEfficiency[2] = 4;
+    printf("Vehicle data added successfully\n");
+}
+
+
+
+void addDelivery(){
+
+    printf("Available city indices:\n");
+    printCityIndices();
+    printf("Enter source Index:\n");
+    scanf("%d",&srcList[deliveryCount]);
+    printf("Enter destination city index: \n");
+    scanf("%d",&destList[deliveryCount]);
+    if (srcList[deliveryCount] == destList[deliveryCount]){
+        printf("Invalid city selection. \n");
+        return;
+    }
+    printf("Enter package weight (kg): ");
+    scanf("%f", &weightList[deliveryCount]);
+    printf("Select vehicle type:\n");
+    printf("1. Van \n");
+    printf("2. Truck \n");
+    printf("3. Lorry \n");
+    printf("Enter choice: ");
+    scanf("%d", &vehicleTypeList[deliveryCount]);
+
+    int v = vehicleTypeList[deliveryCount] - 1;
+    if (weightList[deliveryCount] > capacity[v]) {
+        printf("Weight exceeds vehicle capacity!\n");
+        return;
+    }
+
+    int d = distanceMatrix[srcList[deliveryCount]][destList[deliveryCount]];
+    if (d <= 0) {
+        printf("Distance not set between the selected cities.\n");
+        return;
+    }
+    printf("Data uploaded\n");
+
+}
+
+void deliveryCalculations(){
+    int v= vehicleTypeList[deliveryCount]-1;
+    if (weightList[deliveryCount] > capacity[v]) {
+        printf("Weight exceeds vehicle capacity!\n");
+        return;
+    }
+
+    int d = distanceMatrix[srcList[deliveryCount]][destList[deliveryCount]];
+    if (d <= 0) {
+        printf("Distance not set between selected cities!\n");
+        return;
+    }
+
+    float w = weightList[deliveryCount];
+    float rate = ratePerKm[v];
+    float spd = avgSpeed[v];
+    float eff = fuelEfficiency[v];
+
+    distanceList[deliveryCount] = d;
+    costList[deliveryCount] = d * rate * (1 + (w / 10000.0));
+    fuelUsedList[deliveryCount] = d / eff;
+    fuelCostList[deliveryCount] = fuelUsedList[deliveryCount] * FUEL_PRICE;
+    totalCostList[deliveryCount] = costList[deliveryCount] + fuelCostList[deliveryCount];
+    profitList[deliveryCount] = costList[deliveryCount] * 0.25;
+    chargeList[deliveryCount] = totalCostList[deliveryCount] + profitList[deliveryCount];
+    timeList[deliveryCount] = d / spd;
+
+    printf("\n=== DELIVERY SUMMARY ===\n");
+    printf("From: %s\nTo: %s\nDistance: %d km\nVehicle: %s\nWeight: %.2f kg\n", cityNames[srcList[deliveryCount]], cityNames[destList[deliveryCount]], d, vehiclenames[v], w);
+    printf("Base Cost: %.2f\nFuel Used: %.2f L\nFuel Cost: %.2f\nTotal Cost: %.2f\nProfit: %.2f\nCustomer Charge: %.2f\nEstimated Time: %.2f hours\n",
+           costList[deliveryCount], fuelUsedList[deliveryCount], fuelCostList[deliveryCount],
+           totalCostList[deliveryCount], profitList[deliveryCount], chargeList[deliveryCount], timeList[deliveryCount]);
+    printf("=========================\n");
+
+    deliveryCount++;
+}
+
+
+//file handling functions
 void loadRoutes() {
     FILE *fp = fopen("routes.txt", "r");
     if (fp == NULL) {
@@ -309,33 +426,4 @@ void saveDeliveries() {
                 chargeList[i], timeList[i]);
     }
     fclose(fp);
-}
- vehiclenames[MAX_VEHICLES]={'Van','Truck','Lorry'};
-                    vehicleTypeList={1,2,3};
-                    capacity={1000,5000,10000};
-                    ratePerKm={30,40,80};
-                    avgSpeed={60,50,45};
-                    fuelEfficiency={12,6,4};
-void addVehicleData(){
-    vehicleTypeList[0]={1};
-    vehiclenames[0]={'Van'};
-    capacity[0]={1000};
-    ratePerKm[0]={30};
-    avgSpeed[0]={60};
-    fuelEfficiency[0]={12};
-
-    vehicleTypeList[1]={2};
-    vehiclenames[1]={'Truck'};
-    capacity[1]={5000};
-    ratePerKm[1]={40};
-    avgSpeed[1]={50};
-    fuelEfficiency[1]={6};
-
-    vehicleTypeList[1]={3};
-    vehiclenames[1]={'Lorry'};
-    capacity[1]={10000};
-    ratePerKm[1]={80};
-    avgSpeed[1]={45};
-    fuelEfficiency[1]={4};
-    printf("Vehicle data added successfully\n");
 }
