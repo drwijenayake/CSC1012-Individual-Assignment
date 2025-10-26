@@ -4,6 +4,7 @@
 #define MAX_CITIES 30
 #define MAX_DELIVERIES 50
 #define FUEL_PRICE 310
+#define MAX_VEHICLES 3
 
 //global variables
 int cityCount = 0;
@@ -12,10 +13,11 @@ int deliveryCount = 0;
 //global arrays
 char cityNames[MAX_CITIES][50];
 int distanceMatrix[MAX_CITIES][MAX_CITIES];
+
+//delivery arrays
 int srcList[MAX_DELIVERIES];
 int destList[MAX_DELIVERIES];
 float weightList[MAX_DELIVERIES];
-int vehicleTypeList[MAX_DELIVERIES];         // Vehicle type 1–3
 float distanceList[MAX_DELIVERIES];
 float costList[MAX_DELIVERIES];
 float fuelUsedList[MAX_DELIVERIES];
@@ -26,9 +28,19 @@ float chargeList[MAX_DELIVERIES];
 float timeList[MAX_DELIVERIES];
 
 
+//vehicle arrays
+int vehicleTypeList[MAX_VEHICLES];
+char vehiclenames[MAX_VEHICLES][20];
+int capacity[MAX_VEHICLES];
+int ratePerKm[MAX_VEHICLES];
+int avgSpeed[MAX_VEHICLES];
+int fuelEfficiency[MAX_VEHICLES];
+
+
 //function declarations
 void manageCities();
 void manageDistances();
+void addVehicleData();
 
 //file handling
 void loadRoutes();
@@ -62,7 +74,9 @@ int main()
             case 2:
                     manageDistances();
                     break;
+
             case 3:
+                    addVehicleData()
                     break;
 
 
@@ -295,4 +309,33 @@ void saveDeliveries() {
                 chargeList[i], timeList[i]);
     }
     fclose(fp);
+}
+ vehiclenames[MAX_VEHICLES]={'Van','Truck','Lorry'};
+                    vehicleTypeList={1,2,3};
+                    capacity={1000,5000,10000};
+                    ratePerKm={30,40,80};
+                    avgSpeed={60,50,45};
+                    fuelEfficiency={12,6,4};
+void addVehicleData(){
+    vehicleTypeList[0]={1};
+    vehiclenames[0]={'Van'};
+    capacity[0]={1000};
+    ratePerKm[0]={30};
+    avgSpeed[0]={60};
+    fuelEfficiency[0]={12};
+
+    vehicleTypeList[1]={2};
+    vehiclenames[1]={'Truck'};
+    capacity[1]={5000};
+    ratePerKm[1]={40};
+    avgSpeed[1]={50};
+    fuelEfficiency[1]={6};
+
+    vehicleTypeList[1]={3};
+    vehiclenames[1]={'Lorry'};
+    capacity[1]={10000};
+    ratePerKm[1]={80};
+    avgSpeed[1]={45};
+    fuelEfficiency[1]={4};
+    printf("Vehicle data added successfully\n");
 }
