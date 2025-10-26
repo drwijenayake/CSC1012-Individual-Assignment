@@ -87,6 +87,10 @@ int main()
                     addDelivery();
                     break;
 
+            case 5:
+                    deliveryCalculations();
+                    break;
+
 
         }
 
